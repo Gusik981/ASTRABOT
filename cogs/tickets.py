@@ -7,6 +7,18 @@ from utils.transcript import generate_html_transcript
 
 ASTRAGRIEF_COLOR = discord.Color.from_rgb(168, 85, 247)  # Фирменный фиолетовый астрал-цвет AstraGrief
 
+# Роли персонала сервера AstraGrief, имеющие доступ к тикетам:
+DEFAULT_STAFF_ROLE_IDS = [
+    1564010974288285746,  # ・Команда проекта
+    1564010974288285752,  # ・Смотрящий
+    1564010974321836118,  # ・Куратор
+    1564010974321836119,  # ・Администратор
+    1564337744984146051,  # ・Технический Администратор
+    1564010974321836121,  # ・Главный Администратор
+    1564010974330097714,  # ・Со-Владелец
+    1564010974330097715,  # ・Владелец
+]
+
 
 class TicketReasonModal(discord.ui.Modal, title="AstraGrief >> Создание обращения"):
     topic = discord.ui.TextInput(
@@ -384,10 +396,14 @@ class TicketsCog(commands.Cog, name="Tickets"):
             )
         }
 
-        # Роли поддержки из конфига и автоопределение ролей модерации
+        # Выдаем права всем ролям персонала AstraGrief
+        staff_ids = list(DEFAULT_STAFF_ROLE_IDS)
         cfg_role = self.config.get("support_role_id", 0)
-        if cfg_role and int(cfg_role) != 0:
-            role = guild.get_role(int(cfg_role))
+        if cfg_role and int(cfg_role) != 0 and int(cfg_role) not in staff_ids:
+            staff_ids.append(int(cfg_role))
+
+        for rid in staff_ids:
+            role = guild.get_role(rid)
             if role:
                 overwrites[role] = discord.PermissionOverwrite(
                     view_channel=True,
@@ -396,18 +412,6 @@ class TicketsCog(commands.Cog, name="Tickets"):
                     attach_files=True,
                     embed_links=True
                 )
-        else:
-            # Автоматически ищем роли администрации/поддержки
-            for r in guild.roles:
-                r_name = r.name.lower()
-                if any(k in r_name for k in ["команда", "администратор", "куратор", "модератор", "support", "staff", "хелпер", "влад"]):
-                    overwrites[r] = discord.PermissionOverwrite(
-                        view_channel=True,
-                        send_messages=True,
-                        read_message_history=True,
-                        attach_files=True,
-                        embed_links=True
-                    )
 
         clean_username = "".join(c for c in user.name.lower() if c.isalnum() or c in ("-", "_"))[:10]
         channel_name = f"│🎬・{clean_username}" if is_media else f"│🎫・{clean_username}"

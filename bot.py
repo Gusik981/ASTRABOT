@@ -32,12 +32,12 @@ def load_config() -> dict:
         except Exception as e:
             logger.warning(f"Не удалось прочитать config.json: {e}")
 
-    # Значения по умолчанию
+    # Значения по умолчанию для сервера AstraGrief
     cfg.setdefault("prefix", "!")
-    cfg.setdefault("guild_id", 0)
-    cfg.setdefault("support_role_id", 0)
-    cfg.setdefault("ticket_category_id", 0)
-    cfg.setdefault("closed_category_id", 0)
+    cfg.setdefault("guild_id", 1564010974275575909)
+    cfg.setdefault("support_role_id", 1564010974288285746)
+    cfg.setdefault("ticket_category_id", 1564010975504375909)
+    cfg.setdefault("closed_category_id", 1564010975504375911)
     cfg.setdefault("log_channel_id", 0)
     cfg.setdefault("sync_commands", True)
     cfg.setdefault("privileged_intents", False)
